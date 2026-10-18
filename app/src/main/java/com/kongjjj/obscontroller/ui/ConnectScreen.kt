@@ -147,7 +147,7 @@ fun ConnectScreen(
     ) {
         Text("OBS Controller", style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary)
-        Text("Controller app for IRL Streaming.", style = MaterialTheme.typography.bodyMedium,
+        Text("Controller app for IRL streaming.", style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         if (reconnecting) {
@@ -204,6 +204,7 @@ fun ConnectScreen(
                     onClick = { selectedId = NEW_PROFILE.id },
                     label = { Text("新增") },
                     shape = CircleShape,
+                    modifier = Modifier.height(40.dp),
                     leadingIcon = {
                         Icon(Icons.Default.Add, contentDescription = "New profile",
                             modifier = Modifier.size(16.dp))
@@ -216,7 +217,7 @@ fun ConnectScreen(
 
         // ── Form ──────────────────────────────────────────────────────────────
 
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("設定檔名稱") },
@@ -226,7 +227,7 @@ fun ConnectScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = host,
             onValueChange = { host = it },
             label = { Text("OBS Websocket IP 地址") },
@@ -236,17 +237,21 @@ fun ConnectScreen(
             shape = CircleShape,
             visualTransformation = if (showHost) VisualTransformation.None else PasswordVisualTransformation('•'),
             trailingIcon = {
-                IconButton(onClick = { showHost = !showHost }) {
+                IconButton(
+                    onClick = { showHost = !showHost },
+                    modifier = Modifier.size(36.dp)
+                ) {
                     Icon(
                         imageVector = if (showHost) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (showHost) "Hide IP" else "Show IP"
+                        contentDescription = if (showHost) "Hide IP" else "Show IP",
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = port,
             onValueChange = { port = it.filter { c -> c.isDigit() } },
             label = { Text("Port") },
@@ -257,7 +262,7 @@ fun ConnectScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
+        CompactOutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("密碼 (選擇式)") },
@@ -266,10 +271,14 @@ fun ConnectScreen(
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             trailingIcon = {
-                IconButton(onClick = { showPassword = !showPassword }) {
+                IconButton(
+                    onClick = { showPassword = !showPassword },
+                    modifier = Modifier.size(36.dp)
+                ) {
                     Icon(
                         imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (showPassword) "Hide" else "Show"
+                        contentDescription = if (showPassword) "Hide" else "Show",
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             },
@@ -293,7 +302,7 @@ fun ConnectScreen(
                     selectedId = profile.id
                 },
                 enabled = canAct,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().height(40.dp)
             ) {
                 Text(if (isNewProfile) "另存為新的設定檔" else "儲存設定")
             }
@@ -392,6 +401,7 @@ private fun ProfileChip(
         onClick = onClick,
         label = { Text(label) },
         shape = CircleShape,
+        modifier = Modifier.height(40.dp),
         trailingIcon = {
             IconButton(onClick = onDelete, modifier = Modifier.size(18.dp)) {
                 Icon(Icons.Default.Close, contentDescription = "Delete $label",

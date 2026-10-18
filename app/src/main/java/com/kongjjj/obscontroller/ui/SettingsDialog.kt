@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -133,6 +134,7 @@ fun SettingsDialog(
             ) {
 
                 // ── Twitch channel ─────────────────────────────────────────
+                val twitchColor = Color(0xFF9146FF)
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Twitch 頻道", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -140,11 +142,17 @@ fun SettingsDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = channelInput,
                             onValueChange = { channelInput = it },
                             placeholder = { Text("頻道名稱") },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = twitchColor,
+                                unfocusedBorderColor = twitchColor.copy(alpha = 0.7f),
+                                focusedLabelColor = twitchColor,
+                                cursorColor = twitchColor
+                            ),
                             modifier = Modifier.weight(1f),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = {
@@ -160,12 +168,18 @@ fun SettingsDialog(
                                 val trimmed = channelInput.trim().lowercase()
                                 onSaveChannel(trimmed)
                                 Toast.makeText(context, "已儲存", Toast.LENGTH_SHORT).show()
-                            }
+                            },
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = twitchColor,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.height(40.dp)
                         ) { Text("儲存") }
                     }
                 }
 
                 // ── YouTube Channel ID ───────────────────────────────────────
+                val youtubeColor = Color(0xFFFF0000)
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("YouTube 頻道 ID (UC...)", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -173,11 +187,17 @@ fun SettingsDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = youtubeInput,
                             onValueChange = { youtubeInput = it },
                             placeholder = { Text("Channel ID") },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = youtubeColor,
+                                unfocusedBorderColor = youtubeColor.copy(alpha = 0.7f),
+                                focusedLabelColor = youtubeColor,
+                                cursorColor = youtubeColor
+                            ),
                             modifier = Modifier.weight(1f),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = {
@@ -193,12 +213,18 @@ fun SettingsDialog(
                                 val trimmed = youtubeInput.trim()
                                 onSaveYoutubeChannelId(trimmed)
                                 Toast.makeText(context, "已儲存", Toast.LENGTH_SHORT).show()
-                            }
+                            },
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = youtubeColor,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.height(40.dp)
                         ) { Text("儲存") }
                     }
                 }
 
                 // ── Kick Channel ──────────────────────────────────────────────
+                val kickColor = Color(0xFF53FC18)
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Kick 頻道", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -206,11 +232,17 @@ fun SettingsDialog(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        CompactOutlinedTextField(
                             value = kickInput,
                             onValueChange = { kickInput = it },
                             placeholder = { Text("頻道名稱") },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = kickColor,
+                                unfocusedBorderColor = kickColor.copy(alpha = 0.7f),
+                                focusedLabelColor = kickColor,
+                                cursorColor = kickColor
+                            ),
                             modifier = Modifier.weight(1f),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = {
@@ -226,7 +258,12 @@ fun SettingsDialog(
                                 val trimmed = kickInput.trim().lowercase().removePrefix("/")
                                 onSaveKickChannel(trimmed)
                                 Toast.makeText(context, "已儲存", Toast.LENGTH_SHORT).show()
-                            }
+                            },
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = kickColor,
+                                contentColor = Color.Black
+                            ),
+                            modifier = Modifier.height(40.dp)
                         ) { Text("儲存") }
                     }
                 }
