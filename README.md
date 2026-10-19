@@ -26,12 +26,7 @@ OBS Controller 是一款繁體中文 Android 的應用程式，可觀看聊天�
   
 </p>
 
-<div align="center">
 
-![OBS-Controller](pics/Screenshot_0.jpg)
-![OBS-Controller](pics/Screenshot_1.jpg)
-
-</div>
 
 ---
 
