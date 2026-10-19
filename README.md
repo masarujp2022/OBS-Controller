@@ -3,7 +3,7 @@
 
 <img src="pics/OBS-Controller.jpg" width="158" height="158" alt="OBS Controller">
 
-<h1>OBS Controller</h1>
+<h1>OBS Controller + Chat Reader</h1>
 
 OBS Controller 是一款繁體中文 Android 的應用程式，可觀看聊天室。
 
