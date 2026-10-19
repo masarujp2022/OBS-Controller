@@ -20,6 +20,12 @@ OBS Controller 是一款繁體中文 Android 的應用程式，可觀看聊天�
 
 ---
 
+<p float="left">
+  <img src="pics/Screenshot_0.jpg" width="250" />
+  <img src="pics/Screenshot_0.jpg" width="250" />
+  
+</p>
+
 <div align="center">
 
 ![OBS-Controller](pics/Screenshot_0.jpg)
