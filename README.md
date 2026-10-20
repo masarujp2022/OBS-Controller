@@ -11,6 +11,7 @@ OBS Controller 是一款繁體中文 Android 的應用程式，可觀看聊天�
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com)
 [![Kick](https://img.shields.io/badge/Kick-00E701?style=for-the-badge&logo=kick&logoColor=white)](https://kick.com/)
 [![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://)
+![GitHub repo size](https://img.shields.io/github/repo-size/masarujp2022/OBS-Controller?&style=for-the-badge)
 <br>
 [![Last Commit](https://img.shields.io/github/last-commit/masarujp2022/OBS-Controller?style=for-the-badge)](https://github.com/masarujp2022/OBS-Controller/commits)
 ![GitHub top language](https://img.shields.io/github/languages/top/masarujp2022/OBS-Controller?&style=for-the-badge)
