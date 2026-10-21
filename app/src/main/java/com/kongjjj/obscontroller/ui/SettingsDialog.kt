@@ -6,9 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,8 +53,6 @@ fun SettingsDialog(
     enable7tv: Boolean,
     enableBttv: Boolean,
     enableFfz: Boolean,
-    showMiniMixer: Boolean,
-    filterMiniMixerByScene: Boolean,
     filterMainMixerByScene: Boolean,
     showCollectionChip: Boolean,
     onSaveChannel: (String) -> Unit,
@@ -70,8 +72,6 @@ fun SettingsDialog(
     onEnable7tvChange: (Boolean) -> Unit,
     onEnableBttvChange: (Boolean) -> Unit,
     onEnableFfzChange: (Boolean) -> Unit,
-    onShowMiniMixerChange: (Boolean) -> Unit,
-    onFilterMiniMixerBySceneChange: (Boolean) -> Unit,
     onFilterMainMixerBySceneChange: (Boolean) -> Unit,
     onShowCollectionChipChange: (Boolean) -> Unit,
     ttsEnabled: Boolean,
@@ -109,18 +109,38 @@ fun SettingsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null
         ) { hideKeyboard() },
         title = {
-            Text(
-                "設定",
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { hideKeyboard() }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { hideKeyboard() },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "設定",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Normal
+                )
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "關閉",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         },
         text = {
             Column(
@@ -534,38 +554,6 @@ fun SettingsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text("迷你混音器 (Mini Mixer)", style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("在場景分頁顯示音效控制",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
-                    }
-                    Switch(checked = showMiniMixer, onCheckedChange = onShowMiniMixerChange)
-                }
-
-                if (showMiniMixer) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                            Text("按場景過濾", style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("僅顯示當前場景的音軌",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
-                        }
-                        Switch(checked = filterMiniMixerByScene, onCheckedChange = onFilterMiniMixerBySceneChange)
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                         Text("場景清單切換器", style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("顯示用於切換場景清單 (Collection) 的按鈕",
@@ -656,7 +644,8 @@ fun SettingsDialog(
                         val languages = listOf(
                             "zh-TW" to "國語 (台灣)",
                             "zh-HK" to "廣東話 (香港)",
-                            "zh-CN" to "國語 (簡體)"
+                            "zh-CN" to "國語 (簡體)",
+                            "en-US" to "英文 (美國)"
                         )
                         val currentLangLabel = languages.find { it.first == ttsLanguage }?.second ?: "國語 (台灣)"
 
@@ -734,8 +723,6 @@ fun SettingsDialog(
                 )
             }
         },
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text("關閉") }
-        }
+        confirmButton = {}
     )
 }

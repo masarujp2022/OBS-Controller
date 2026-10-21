@@ -73,8 +73,7 @@ class ProfileStore(context: Context) {
     fun getEnableFfz(): Boolean = prefs.getBoolean("enable_ffz", true)
     fun setEnableFfz(enabled: Boolean) = prefs.edit { putBoolean("enable_ffz", enabled) }
 
-    fun getShowMiniMixer(): Boolean = prefs.getBoolean("show_mini_mixer", true)
-    fun setShowMiniMixer(enabled: Boolean) = prefs.edit { putBoolean("show_mini_mixer", enabled) }
+
 
     fun getShowMessageTime(): Boolean = prefs.getBoolean("show_message_time", false)
     fun setShowMessageTime(enabled: Boolean) = prefs.edit { putBoolean("show_message_time", enabled) }
@@ -91,8 +90,7 @@ class ProfileStore(context: Context) {
     fun getFullScreenActive(): Boolean = prefs.getBoolean("fullscreen_active", false)
     fun setFullScreenActive(active: Boolean) = prefs.edit { putBoolean("fullscreen_active", active) }
 
-    fun getFilterMiniMixerByScene(): Boolean = prefs.getBoolean("filter_mini_mixer_by_scene", false)
-    fun setFilterMiniMixerByScene(enabled: Boolean) = prefs.edit { putBoolean("filter_mini_mixer_by_scene", enabled) }
+
 
     fun getFilterMainMixerByScene(): Boolean = prefs.getBoolean("filter_main_mixer_by_scene", false)
     fun setFilterMainMixerByScene(enabled: Boolean) = prefs.edit { putBoolean("filter_main_mixer_by_scene", enabled) }

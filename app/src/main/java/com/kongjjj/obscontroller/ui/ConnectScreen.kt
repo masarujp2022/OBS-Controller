@@ -18,10 +18,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.kongjjj.obscontroller.ConnectionState
+import com.kongjjj.obscontroller.R
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 import com.kongjjj.obscontroller.DEFAULT_OBS_PORT
@@ -251,48 +254,58 @@ fun ConnectScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        CompactOutlinedTextField(
-            value = port,
-            onValueChange = { port = it.filter { c -> c.isDigit() } },
-            label = { Text("Port") },
-            placeholder = { Text("4455") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            shape = CircleShape,
-            modifier = Modifier.fillMaxWidth()
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CompactOutlinedTextField(
+                value = port,
+                onValueChange = { port = it.filter { c -> c.isDigit() } },
+                label = { Text("Port") },
+                placeholder = { Text("4455") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                shape = CircleShape,
+                modifier = Modifier.weight(1f)
+            )
 
-        CompactOutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("密碼 (選擇式)") },
-            singleLine = true,
-            shape = CircleShape,
-            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                IconButton(
-                    onClick = { showPassword = !showPassword },
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (showPassword) "Hide" else "Show",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+            CompactOutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("密碼 (選擇式)") },
+                singleLine = true,
+                shape = CircleShape,
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { showPassword = !showPassword },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (showPassword) "Hide" else "Show",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                },
+                modifier = Modifier.weight(1.8f)
+            )
+        }
 
         // ── Action buttons ────────────────────────────────────────────────────
 
         val portInt = port.toIntOrNull() ?: DEFAULT_OBS_PORT
         val canAct = !isConnecting && host.isNotBlank()
+        val blueButtonColors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF03A9F4),
+            contentColor = Color.Black
+        )
 
         // Save profile button (only shown when name is filled)
         if (name.isNotBlank()) {
-            OutlinedButton(
+            Button(
                 onClick = {
                     val profile = if (isNewProfile)
                         OBSProfile(name = name, host = host, port = portInt, password = password)
@@ -302,8 +315,11 @@ fun ConnectScreen(
                     selectedId = profile.id
                 },
                 enabled = canAct,
+                colors = blueButtonColors,
                 modifier = Modifier.fillMaxWidth().height(40.dp)
             ) {
+                Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(if (isNewProfile) "另存為新的設定檔" else "儲存設定")
             }
         }
@@ -361,15 +377,23 @@ fun ConnectScreen(
                 onConnect(profile)
             },
             enabled = canAct,
-            modifier = Modifier.fillMaxWidth().height(52.dp)
+            colors = blueButtonColors,
+            modifier = Modifier.fillMaxWidth().height(40.dp)
         ) {
             if (isConnecting) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary)
+                    color = Color.Black)
                 Spacer(Modifier.width(8.dp))
                 Text("連線中...")
             } else {
-                Text("連線")
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_obs),
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("連線到OBS")
             }
         }
 

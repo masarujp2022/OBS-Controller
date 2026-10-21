@@ -85,7 +85,6 @@ fun OBSControllerApp(vm: OBSViewModel = viewModel()) {
     val state by vm.state.collectAsState()
     val scenes by vm.scenes.collectAsState()
     val currentScene by vm.currentScene.collectAsState()
-    val inputs by vm.inputs.collectAsState()
     val profiles by vm.profiles.collectAsState()
     val streamActive by vm.streamActive.collectAsState()
     val recordActive by vm.recordActive.collectAsState()
@@ -127,8 +126,6 @@ fun OBSControllerApp(vm: OBSViewModel = viewModel()) {
     val sceneCollections by vm.sceneCollections.collectAsState()
     val currentSceneCollection by vm.currentSceneCollection.collectAsState()
     val volumeMeters by vm.volumeMeters.collectAsState()
-    val showMiniMixer by vm.showMiniMixer.collectAsState()
-    val filterMiniMixerByScene by vm.filterMiniMixerByScene.collectAsState()
     val showCollectionChip by vm.showCollectionChip.collectAsState()
     val ttsEnabled by vm.ttsEnabled.collectAsState()
     val ttsSubBitsOnly by vm.ttsSubBitsOnly.collectAsState()
@@ -229,12 +226,8 @@ fun OBSControllerApp(vm: OBSViewModel = viewModel()) {
             onEnable7tvChange = { vm.setEnable7tv(it) },
             onEnableBttvChange = { vm.setEnableBttv(it) },
             onEnableFfzChange = { vm.setEnableFfz(it) },
-            showMiniMixer = showMiniMixer,
-            filterMiniMixerByScene = filterMiniMixerByScene,
             filterMainMixerByScene = vm.filterMainMixerByScene.collectAsState().value,
             showCollectionChip = showCollectionChip,
-            onShowMiniMixerChange = { vm.setShowMiniMixer(it) },
-            onFilterMiniMixerBySceneChange = { vm.setFilterMiniMixerByScene(it) },
             onFilterMainMixerBySceneChange = { vm.setFilterMainMixerByScene(it) },
             onShowCollectionChipChange = { vm.setShowCollectionChip(it) },
             ttsEnabled = ttsEnabled,
@@ -435,18 +428,14 @@ fun OBSControllerApp(vm: OBSViewModel = viewModel()) {
                         sceneCollections = sceneCollections,
                         currentSceneCollection = currentSceneCollection,
                         onSetSceneCollection = { vm.setSceneCollection(it) },
-                        inputs = inputs,
-                        onToggleMute = { vm.toggleMute(it) },
-                        onMiniVolumeChange = { name, db -> vm.setVolume(name, db) },
-                        volumeMeters = volumeMeters,
-                        showMiniMixer = showMiniMixer,
-                        filterMiniMixerByScene = filterMiniMixerByScene,
                         showCollectionChip = showCollectionChip
                     )
                     1 -> AudioScreen(
                         inputs = audioMixerInputs,
                         filters = filters,
                         volumeMeters = volumeMeters,
+                        filterMainMixerByScene = vm.filterMainMixerByScene.collectAsState().value,
+                        currentScene = currentScene,
                         onToggleMute = { vm.toggleMute(it) },
                         onVolumeChange = { name, db -> vm.setVolume(name, db) },
                         onLoadFilters = { vm.loadFilters(it) },

@@ -321,14 +321,32 @@ class OBSViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private val _showMiniMixer = MutableStateFlow(store.getShowMiniMixer())
-    val showMiniMixer: StateFlow<Boolean> = _showMiniMixer
 
-    private val _filterMiniMixerByScene = MutableStateFlow(store.getFilterMiniMixerByScene())
-    val filterMiniMixerByScene: StateFlow<Boolean> = _filterMiniMixerByScene
 
     private val _filterMainMixerByScene = MutableStateFlow(store.getFilterMainMixerByScene())
     val filterMainMixerByScene: StateFlow<Boolean> = _filterMainMixerByScene
+
+    init {
+        viewModelScope.launch {
+            combine(
+                currentScene,
+                previewScene,
+                studioModeEnabled,
+                _filterMainMixerByScene
+            ) { cur, prev, studio, filter ->
+                val scenes = if (studio) setOf(cur, prev) else setOf(cur)
+                scenes to filter
+            }.collect { (scenes, filter) ->
+                if (filter) {
+                    scenes.forEach { sceneName ->
+                        if (sceneName.isNotEmpty()) {
+                            loadSceneItems(sceneName)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     val audioMixerInputs = combine(
         inputs,
@@ -355,10 +373,7 @@ class OBSViewModel(app: Application) : AndroidViewModel(app) {
         }.toSet()
 
         allInputs.filter {
-            it.isAudio && it.active && (it.name in activeSourceNames ||
-                    it.kind == "wasapi_input_capture" || it.kind == "wasapi_output_capture" ||
-                    it.kind == "pulse_input_capture" || it.kind == "pulse_output_capture" ||
-                    it.kind == "alsa_input_capture" || it.kind == "coreaudio_input_capture")
+            it.isAudio && it.active && it.name in activeSourceNames
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -758,8 +773,6 @@ class OBSViewModel(app: Application) : AndroidViewModel(app) {
     fun setIsChatLocked(locked: Boolean) { _isChatLocked.value = locked }
     fun setShowDebugBar(enabled: Boolean) { store.setShowDebugBar(enabled); _showDebugBar.value = enabled }
     fun setShowEmoteDebug(enabled: Boolean) { store.setShowEmoteDebug(enabled); _showEmoteDebug.value = enabled }
-    fun setShowMiniMixer(enabled: Boolean) { store.setShowMiniMixer(enabled); _showMiniMixer.value = enabled }
-    fun setFilterMiniMixerByScene(enabled: Boolean) { store.setFilterMiniMixerByScene(enabled); _filterMiniMixerByScene.value = enabled }
     fun setFilterMainMixerByScene(enabled: Boolean) { store.setFilterMainMixerByScene(enabled); _filterMainMixerByScene.value = enabled }
     fun setShowCollectionChip(enabled: Boolean) { store.setShowCollectionChip(enabled); _showCollectionChip.value = enabled }
 
@@ -779,6 +792,7 @@ class OBSViewModel(app: Application) : AndroidViewModel(app) {
         val locale = when (lang) {
             "zh-HK" -> Locale("zh", "HK")
             "zh-CN" -> Locale.SIMPLIFIED_CHINESE
+            "en-US" -> Locale.US
             else -> Locale.TRADITIONAL_CHINESE
         }
         ttsManager.setLanguage(locale)
@@ -820,8 +834,6 @@ class OBSViewModel(app: Application) : AndroidViewModel(app) {
                         _enable7tv.value = store.getEnable7tv()
                         _enableBttv.value = store.getEnableBttv()
                         _enableFfz.value = store.getEnableFfz()
-                        _showMiniMixer.value = store.getShowMiniMixer()
-                        _filterMiniMixerByScene.value = store.getFilterMiniMixerByScene()
                         _filterMainMixerByScene.value = store.getFilterMainMixerByScene()
                         _showCollectionChip.value = store.getShowCollectionChip()
                         _showEmoteDebug.value = store.getShowEmoteDebug()

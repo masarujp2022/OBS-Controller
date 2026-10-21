@@ -32,6 +32,8 @@ fun AudioScreen(
     inputs: List<OBSInput>,
     filters: List<OBSFilter>,
     volumeMeters: Map<String, List<Float>> = emptyMap(),
+    filterMainMixerByScene: Boolean = false,
+    currentScene: String = "",
     onToggleMute: (String) -> Unit,
     onVolumeChange: (String, Float) -> Unit,
     onLoadFilters: (sourceName: String) -> Unit,
@@ -85,8 +87,9 @@ fun AudioScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
+            val title = if (filterMainMixerByScene && currentScene.isNotEmpty()) "Audio Mixer - $currentScene" else "Audio Mixer"
             Text(
-                text = "Audio Mixer",
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )

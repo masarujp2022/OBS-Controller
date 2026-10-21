@@ -4,7 +4,6 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,13 +18,10 @@ import androidx.compose.material.icons.filled.FiberManualRecord
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Layers
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,17 +34,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kongjjj.obscontroller.OBSFilter
-import com.kongjjj.obscontroller.OBSInput
 import com.kongjjj.obscontroller.OBSScene
 import com.kongjjj.obscontroller.OBSSceneItem
-import kotlin.math.log10
 
 private const val TAG = "ScenesScreen"
-
-private fun Float.toDbMeterProgress(): Float {
-    if (this <= 0f) return 0f
-    return ((20f * log10(this) + 60f) / 60f).coerceIn(0f, 1f)
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,12 +81,6 @@ fun ScenesScreen(
     sceneCollections: List<String> = emptyList(),
     currentSceneCollection: String = "",
     onSetSceneCollection: (String) -> Unit = {},
-    inputs: List<OBSInput> = emptyList(),
-    onToggleMute: (String) -> Unit = {},
-    onMiniVolumeChange: (String, Float) -> Unit = { _, _ -> },
-    volumeMeters: Map<String, List<Float>> = emptyMap(),
-    showMiniMixer: Boolean = true,
-    filterMiniMixerByScene: Boolean = false,
     showCollectionChip: Boolean = true
 ) {
     val view = LocalView.current
@@ -109,7 +92,6 @@ fun ScenesScreen(
     var settingsForSource by remember { mutableStateOf<Pair<String, String>?>(null) }
     var confirmStream by remember { mutableStateOf(false) }
     var confirmRecord by remember { mutableStateOf(false) }
-    var miniMixerExpanded by remember { mutableStateOf(false) }
     var showCollectionPicker by remember { mutableStateOf(false) }
 
     if (confirmStream) {
@@ -350,66 +332,6 @@ fun ScenesScreen(
                 }
             }
 
-            // ── Mini mixer (collapsible) ──────────────────────────────────────
-            val activeSceneName = if (studioModeEnabled) previewScene else currentScene
-            LaunchedEffect(activeSceneName, filterMiniMixerByScene) {
-                if (filterMiniMixerByScene && activeSceneName.isNotEmpty()) {
-                    onLoadSceneItems(activeSceneName)
-                }
-            }
-
-            val audioInputs = remember(inputs, sceneItems, filterMiniMixerByScene, activeSceneName) {
-                if (filterMiniMixerByScene) {
-                    val currentSceneItems = sceneItems[activeSceneName] ?: emptyList()
-                    val sceneItemSourceNames = currentSceneItems.map { it.sourceName }.toSet()
-                    inputs.filter { it.isAudio && it.name in sceneItemSourceNames }
-                } else {
-                    inputs.filter { it.isAudio }
-                }
-            }
-
-            if (showMiniMixer && audioInputs.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { miniMixerExpanded = !miniMixerExpanded }
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.VolumeUp,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        "Audio (${audioInputs.size})",
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        imageVector = if (miniMixerExpanded) Icons.Default.KeyboardArrowUp
-                                      else Icons.Default.KeyboardArrowDown,
-                        contentDescription = if (miniMixerExpanded) "Collapse" else "Expand",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                AnimatedVisibility(visible = miniMixerExpanded) {
-                    Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                        audioInputs.forEach { input ->
-                            MiniMixerRow(
-                                input = input,
-                                peaks = volumeMeters[input.name] ?: emptyList(),
-                                onToggleMute = { onToggleMute(input.name) },
-                                onVolumeChange = { db -> onMiniVolumeChange(input.name, db) }
-                            )
-                        }
-                    }
-                }
-                HorizontalDivider()
-            }
-
             // ── Studio mode split view ────────────────────────────────────────
             if (studioModeEnabled) {
                 Column(modifier = Modifier.padding(12.dp)) {
@@ -597,72 +519,6 @@ fun ScenesScreen(
                             )
                         }
                     }
-            }
-        }
-    }
-}
-
-@Composable
-private fun MiniMixerRow(
-    input: OBSInput,
-    peaks: List<Float>,
-    onToggleMute: () -> Unit,
-    onVolumeChange: (Float) -> Unit
-) {
-    var sliderValue by remember(input.name) {
-        mutableFloatStateOf(input.volumeDb.coerceIn(-60f, 6f))
-    }
-    LaunchedEffect(input.volumeDb) {
-        sliderValue = input.volumeDb.coerceIn(-60f, 6f)
-    }
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().height(44.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onToggleMute, modifier = Modifier.size(36.dp)) {
-                Icon(
-                    imageVector = if (input.muted) Icons.Default.MicOff else Icons.Default.Mic,
-                    contentDescription = if (input.muted) "Unmute" else "Mute",
-                    tint = if (input.muted) MaterialTheme.colorScheme.error
-                           else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-            Text(
-                text = input.name,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                modifier = Modifier.width(72.dp)
-            )
-            Slider(
-                value = sliderValue,
-                onValueChange = { sliderValue = it },
-                onValueChangeFinished = { onVolumeChange(sliderValue) },
-                valueRange = -60f..6f,
-                enabled = !input.muted,
-                modifier = Modifier.weight(1f).height(36.dp)
-            )
-        }
-        if (peaks.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 108.dp, end = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                peaks.forEach { peak ->
-                    LinearProgressIndicator(
-                        progress = { peak.toDbMeterProgress() },
-                        modifier = Modifier.weight(1f).height(3.dp),
-                        color = when {
-                            peak > 0.5f -> MaterialTheme.colorScheme.error   // > -6 dBFS
-                            peak > 0.1f -> Color(0xFFFFB300)                 // > -20 dBFS
-                            else        -> MaterialTheme.colorScheme.primary
-                        },
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                }
             }
         }
     }
